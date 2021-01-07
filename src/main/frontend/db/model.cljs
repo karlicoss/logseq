@@ -832,9 +832,17 @@
                 [?p :page/name ?page]
                 [?block :block/page ?p]
                 [?block :block/ref-pages ?ref-page]
-                [?ref-page :page/name ?ref-page-name]])]
+                [?ref-page :page/name ?ref-page-name]])
+          w '[:find ?page1 ?page2
+               :where
+               [?rp1   :page/name ?page1]
+               [?block :block/ref-pages ?rp1]
+               [?block :block/ref-pages ?rp2]
+               [?rp2   :page/name ?page2]]]
       (->>
-       (d/q q conn)
+       (set/union
+        (d/q q conn)
+        (d/q w conn))
        (map (fn [[page ref-page-name]]
               [page ref-page-name]))))))
 
