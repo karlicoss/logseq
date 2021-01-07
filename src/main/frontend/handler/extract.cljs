@@ -23,12 +23,13 @@
          (map string/lower-case)
          (distinct))))
 
-;; TODO: performance improvement
+;; TODO here?
 (defn- extract-pages-and-blocks
   [repo-url format ast properties file content utf8-content journal? pages-fn]
   (try
     (let [now (tc/to-long (t/now))
           blocks (block/extract-blocks ast (utf8/length utf8-content) utf8-content)
+          ;; TODO ok, so get page refs/tags from properties and set to first block?
           pages (pages-fn blocks ast)
           ref-pages (atom #{})
           ref-tags (atom #{})
@@ -68,16 +69,16 @@
                           page-list (when-let [list-content (:list properties)]
                                       (extract-page-list list-content))]
                       (cond->
-                       (util/remove-nils
-                        {:page/name (string/lower-case page)
-                         :page/original-name page
-                         :page/file [:file/path file]
-                         :page/journal? journal?
-                         :page/journal-day (if journal?
-                                             (date/journal-title->int (string/capitalize page))
-                                             0)
-                         :page/created-at journal-date-long
-                         :page/last-modified-at journal-date-long})
+                          (util/remove-nils
+                           {:page/name (string/lower-case page)
+                            :page/original-name page
+                            :page/file [:file/path file]
+                            :page/journal? journal?
+                            :page/journal-day (if journal?
+                                                (date/journal-title->int (string/capitalize page))
+                                                0)
+                            :page/created-at journal-date-long
+                            :page/last-modified-at journal-date-long})
                         (seq properties)
                         (assoc :page/properties properties)
 
@@ -136,8 +137,11 @@
     []
     (let [journal? (util/starts-with? file "journals/")
           format (format/get-format file)
+          _ (pprint "BEFORE")
           ast (mldoc/->edn content
                            (mldoc/default-config format))
+          ;; TODO right. so tags are in ast?
+          ;; _ (pprint ast)
           first-block (first ast)
           properties (let [properties (and (seq first-block)
                                            (= "Properties" (ffirst first-block))
@@ -161,7 +165,8 @@
                          (when content
                            (let [utf8-content (utf8/encode content)]
                              (extract-blocks-pages repo-url path content utf8-content)))))
-                      (remove empty?))]
+                      (remove empty?))
+          _ (pprint result)]
       (when (seq result)
         (let [[pages block-ids blocks] (apply map concat result)
               block-ids-set (set block-ids)
@@ -171,4 +176,5 @@
                             (-> b
                                 (update :block/ref-blocks #(set/intersection (set %) block-ids-set))
                                 (update :block/embed-blocks #(set/intersection (set %) block-ids-set)))) blocks)]
+
           (apply concat [pages-index pages block-ids blocks]))))))

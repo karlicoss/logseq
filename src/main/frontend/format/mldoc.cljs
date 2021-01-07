@@ -2,6 +2,7 @@
   (:require [frontend.format.protocol :as protocol]
             [frontend.util :as util]
             [clojure.string :as string]
+            [clojure.pprint :refer [pprint]]
             [cljs-bean.core :as bean]
             [cljs.core.match :refer-macros [match]]
             [lambdaisland.glogi :as log]
@@ -126,6 +127,8 @@
                                       (remove string/blank?))]
                         (concat quoted rest)))
           tags (->vec-concat roam-tags (:tags properties) definition-tags filetags)
+          _ (pprint "PARSED TAGS")
+          _ (pprint tags)
           properties (assoc properties :tags tags :alias alias)
           properties (-> properties
                          (update :roam_alias ->vec)

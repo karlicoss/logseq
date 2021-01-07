@@ -184,6 +184,8 @@
                         (let [format (format/get-format (:file/path file))]
                           (contains? config/mldoc-support-formats format)))
                       files)
+        _ (pprint "LOADDINGG")
+        _ (pprint parsed-files)
         blocks-pages (if (seq parsed-files)
                        (extract-handler/extract-all-blocks-pages repo-url parsed-files)
                        [])]

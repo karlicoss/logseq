@@ -4,6 +4,7 @@
             [clojure.string :as string]
             [frontend.format :as format]
             [frontend.utf8 :as utf8]
+            [clojure.pprint :refer [pprint]]
             [medley.core :as medley]
             [frontend.config :as config]
             [datascript.core :as d]
@@ -299,7 +300,14 @@
                   (recur headings block-body (rest blocks) timestamps properties last-pos last-level children))
 
                 (heading-block? block)
-                (let [id (or (when-let [custom-id (or (get-in properties [:properties "custom_id"])
+                (let [_ (pprint "BLOOO")
+                      _ (pprint block) ;; TODO wtf?? it's empty?
+                      ;; {:properties {"debug" "yes", "created_at" nil, "last_modified_at" nil}, :page-refs ()}
+                      ;; shit, right, only individual blocks have these..
+                      ;; oh, and ref-pages-in-properties extracts [[ref]] style
+                      _ (pprint "^^^^")
+
+                      id (or (when-let [custom-id (or (get-in properties [:properties "custom_id"])
                                                       (get-in properties [:properties "id"]))]
                                (let [custom-id (string/trim custom-id)]
                                  (when (util/uuid-string? custom-id)
@@ -327,7 +335,7 @@
                                        :body (vec (reverse block-body))
                                        :properties (:properties properties)
                                        :ref-pages ref-pages-in-properties
-                                       :children (or current-block-children []))
+                                       :children (or current-block-children [])) ;; TODO here?
                                 (assoc-in [:meta :start-pos] start_pos)
                                 (assoc-in [:meta :end-pos] last-pos))
                       block (if (seq timestamps)
@@ -346,7 +354,16 @@
                   (recur headings block-body' (rest blocks) timestamps properties last-pos last-level children))))
             (-> (reverse headings)
                 safe-blocks)))]
+    ;; _ (pprint "MEMEME")
+    ;; _ (pprint blocks)]
+    ;; _ (js/console.error "FWEFUHU")
+    ;; _ (pprint "FHUWHFUWEHFU")
+    ;; _ (pprint blocks)
+    ;; _ (pprint "FHUWHFUWEHFU")]
+
     (let [first-block (first blocks)
+          _ (pprint "FIRST! ") ;; ugh. first block doesn't have the page.. how does that work??
+          _ (pprint blocks)
           first-block-start-pos (get-in first-block [:block/meta :start-pos])]
       (if (and
            (not (string/blank? encoded-content))
@@ -356,6 +373,7 @@
          (merge
           (let [content (utf8/substring encoded-content 0 first-block-start-pos)
                 uuid (d/squuid)]
+            ;; todo hmm. pretty annoying that it's a string... need ast
             (->
              {:uuid uuid
               :content content

@@ -72,15 +72,11 @@
       (let [relation (db/get-pages-relation repo show-journal?)
             tagged-pages (db/get-all-tagged-pages repo)
             tags (set (map second tagged-pages))
-            _ (pprint/pprint "TAGS")
-            _ (pprint/pprint tags) ;; todo huh? it's empty?
             linked-pages (-> (concat
                               relation
                               tagged-pages)
                              flatten
                              set)
-            _ (pprint/pprint "LINKED")
-            _ (pprint/pprint linked-pages)
             all-pages (db/get-pages repo)
             other-pages (->> (remove linked-pages all-pages)
                              (remove nil?))
@@ -89,13 +85,18 @@
             other-pages (if (seq other-pages)
                           (map string/lower-case other-pages)
                           other-pages)
-            nodes (concat (seq relation)
-                          (seq tagged-pages)
-                          (if (seq other-pages)
-                            (map (fn [page]
-                                   [page])
-                                 other-pages)
-                            []))
+            nodes (concat (seq relation))
+                          ;; not sure why tagged pages are queried separately, they sort of belong to the relation?
+                          ;; (seq tagged-pages)
+
+                          ;; TODO not sure why it was here? I think it resulted in stale nodes being shown
+                          ;; they should be removed from the db as well?
+                          ;; (if (seq other-pages)
+                          ;;   (map (fn [page]
+                          ;;          [page])
+                          ;;        other-pages)
+                          ;;   [])
+
             edges (build-edges (remove
                                 (fn [[_ to]]
                                   (nil? to))
