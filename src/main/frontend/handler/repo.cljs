@@ -23,6 +23,7 @@
             [frontend.handler.extract :as extract-handler]
             [frontend.ui :as ui]
             [clojure.string :as string]
+            [clojure.pprint :refer [pprint]]
             [frontend.dicts :as dicts]
             [frontend.spec :as spec]
             [frontend.encrypt :as encrypt]
