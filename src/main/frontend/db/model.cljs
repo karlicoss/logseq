@@ -702,6 +702,9 @@
             property-name (when (and (= "Properties" (ffirst ast))
                                      (not (string/blank? (:title (last (first ast))))))
                             (:title (last (first ast))))
+            logseq-title  (when (and (= "Properties" (ffirst ast))
+                                     (not (string/blank? (:logseq_title (last (first ast))))))
+                            (:logseq_title (last (first ast))))
             first-block-name (and first-block
                                   ;; FIXME:
                                   (str (last (first (:title first-block)))))
@@ -710,8 +713,10 @@
                           (-> file-name
                               (string/replace "-" " ")
                               (string/replace "_" " ")
-                              (util/capitalize-all))))]
-        (or property-name
+                              (util/capitalize-all))))] ;; TODO fuck. why is it capitalizing?? and what's wrong with dashes/underscores?
+
+        (or logseq-title
+            property-name
             (if (= (state/page-name-order) "file")
               (or file-name first-block-name)
               (or first-block-name file-name)))))))
