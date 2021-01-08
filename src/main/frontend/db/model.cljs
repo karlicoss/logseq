@@ -9,6 +9,7 @@
             [frontend.format :as format]
             [frontend.state :as state]
             [clojure.string :as string]
+            [clojure.pprint :refer [pprint]]
             [clojure.set :as set]
             [frontend.utf8 :as utf8]
             [frontend.config :as config]
