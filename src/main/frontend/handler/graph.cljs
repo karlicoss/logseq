@@ -34,11 +34,14 @@
                           [true true]   "#ffffff")
                   color (if (contains? tags (string/lower-case p))
                           (if dark? "orange" "green")
-                          color)]
+                          color)
+                  conns (get-connections p edges)]
               {:id p
                :name p
-               :val (get-connections p edges)
+               ;; ugh. so apparently this only impacts node sizes... whereas I want sources
+               :val conns
                :autoColorBy "group"
+               ;; TODO what's group for?? I don't think colors do anything either
                :group (js/Math.ceil (* (js/Math.random) 12))
                :color color}))
           pages)))
@@ -69,11 +72,15 @@
       (let [relation (db/get-pages-relation repo show-journal?)
             tagged-pages (db/get-all-tagged-pages repo)
             tags (set (map second tagged-pages))
+            _ (pprint/pprint "TAGS")
+            _ (pprint/pprint tags) ;; todo huh? it's empty?
             linked-pages (-> (concat
                               relation
                               tagged-pages)
                              flatten
                              set)
+            _ (pprint/pprint "LINKED")
+            _ (pprint/pprint linked-pages)
             all-pages (db/get-pages repo)
             other-pages (->> (remove linked-pages all-pages)
                              (remove nil?))

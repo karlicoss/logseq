@@ -142,8 +142,35 @@
                                                   :target (-> (gobj/get link "target")
                                                               (gobj/get "id"))}]
                                         (if (contains? @highlight-links link) 2 0)))
+
+      ;; ugh. ngraph doesn't work??
+      ;; :forceEngine "d3"
+      ;; :ngraphPhysics {:springLength 100000 :springCoefficient 0}
+
+      ;; :width 3000
+      ;; :zoom {:number 100 :ms 20000}
+      ;; :cameraPosition [1000, 1000, 1000]
+      ;; hmm, with 0.5 value it just freezes? default is 0
+      ;; basically the smaller it is, the later it freezes?
+      ;; :d3AlphaMin 0.00001
+      ;; :d3AlphaDecay 0.01
+      :d3Force "FWHUF"
+      ;; :cooldownTime 2000
+
+      ;; controls how fast it disperses?
+      ;; :d3AlphaDecay 0.00001
+      ;;
+      ;; As with lowering the alpha decay rate, less velocity decay may converge on a better solution,
+      ;; but risks numerical instabilities and oscillation.
+      ;;
+      ;; if it's 1 it just never moves?
+      :d3VelocityDecay 0.2
+      ;;
       :onNodeHover on-node-hover
       :onLinkHover on-link-hover
+      ;; :nodeVal (fn [n] (if (= (gobj/get n "id") "hpi") (do (js/console.error "YEEES" n) 1000) 1))
+      :nodeVal 100
+      ;; :nodeVal "val"
       :nodeLabel "id"
       :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.1)"))
       :onZoom (fn [z]
