@@ -4,6 +4,7 @@
             [frontend.util :as util]
             [cljs-bean.core :as bean]
             [clojure.string :as string]
+            [clojure.pprint :refer [pprint]]
             [goog.dom :as gdom]
             [frontend.publishing.html :as html]
             [frontend.text :as text]

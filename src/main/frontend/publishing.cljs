@@ -7,6 +7,7 @@
             [frontend.handler.route :as route]
             [frontend.page :as page]
             [frontend.routes :as routes]
+            [clojure.pprint :refer [pprint]]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [cljs.reader :as reader]))
@@ -30,7 +31,8 @@
   []
   (state/set-current-repo! "local")
   (when-let [data js/window.logseq_db]
-    (let [data (js/JSON.stringify data)
+    (let [;; data (js/JSON.stringify data)
+          _ (pprint data)
           db-conn (d/create-conn db-schema/schema)
           _ (swap! db/conns assoc "logseq-db/local" db-conn)
           db (db/string->db data)]

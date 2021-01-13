@@ -11,6 +11,7 @@
             [clojure.string :as string]
             [clojure.set :as set]
             [frontend.utf8 :as utf8]
+            [clojure.pprint :refer [pprint]]
             [frontend.config :as config]
             [frontend.format.block :as block]
             [cljs.reader :as reader]
