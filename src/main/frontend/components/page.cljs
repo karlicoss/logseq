@@ -415,6 +415,7 @@
 (defonce show-journal? (atom false))
 (defonce dot-mode? (atom false))
 
+;; TODO shit. maybe stuff here also contributes??
 (rum/defcs global-graph < rum/reactive
   [state]
   (let [theme (state/sub :ui/theme)
