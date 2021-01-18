@@ -47,6 +47,10 @@
     {:name :graph
      :view page/global-graph}]
 
+   ["/logseq"
+    {:name :graph2
+     :view page/global-graph}]
+
    ["/diff"
     {:name :diff
      :view diff/diff}]
