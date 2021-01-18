@@ -302,7 +302,7 @@
         white? (= "white" (state/sub :ui/theme))
         sidebar-open? (state/sub :ui/sidebar-open?)
         route-name (get-in route-match [:data :name])
-        global-graph-pages? (= :graph route-name)
+        global-graph-pages? (contains? #{:graph :graph2} route-name)
         logged? (:name me)
         db-restoring? (state/sub :db/restoring?)
         indexeddb-support? (state/sub :indexeddb/support?)

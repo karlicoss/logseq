@@ -39,6 +39,8 @@
     "Add another repo"
     :graph
     "Graph"
+    :graph2
+    "Graph"
     :all-files
     "All files"
     :all-pages
