@@ -861,6 +861,7 @@
                 [(get ?pp :logseq_graph "true") ?tt]
                 [(== ?tt "false")]]
           ignored (set (map first (d/q ign conn)))
+          ignored (set/union ignored (state/get-suppressed-tags))
 
           q (if with-journal?
               '[:find ?page ?ref-page-name

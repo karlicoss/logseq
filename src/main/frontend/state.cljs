@@ -168,6 +168,11 @@
   []
   (true? (:all-pages-public? (get-config))))
 
+;; tags ignored from the pages relation to prevent bloating the graph
+(defn get-suppressed-tags
+  []
+  (:suppressed-tags (get-config)))
+
 (defn enable-grammarly?
   []
   (true? (:feature/enable-grammarly?
