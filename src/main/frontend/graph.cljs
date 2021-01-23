@@ -7,7 +7,12 @@
             [frontend.state :as state]
             [frontend.db :as db]
             ["three-spritetext" :as SpriteText]
+            ["three" :as Three]
             [cljs-bean.core :as bean]))
+
+
+(def Mesh   (gobj/get Three "Mesh"))
+(def Sphere (gobj/get Three "SphereGeometry"))
 
 ;; translated from https://github.com/vasturiano/react-force-graph/blob/master/example/highlight/index.html
 (defonce graph-mode (atom :dot-text))
@@ -132,10 +137,26 @@
   [node]
   (let [label (gobj/get node "id")
         val (gobj/get node "val")
-        val (if (zero? val) 1 val)
+        val (max val 2.0)
         textcolor (gobj/get node "color")
+        height (js/Math.min
+                30
+                (js/Math.max
+                 5
+                 (js/Math.exp val)))
+        ;; height (js/Math.max
+        ;;         (* (js/Math.log val) 10)
+        ;;         1)
+        ;; shit, it overlaps the node and ends up pretty ugly... why does it have to be so hard
         res (new SpriteText label)]
-    (set! (.-color res) textcolor)
+        ;; fuck this, it does't work
+        ;; sph (new Sphere 10)
+        ;; th  (new Mesh (clj->js [sph]))]
+    ;; (.add res th)
+    (set! (.-color           res) textcolor)
+    (set! (.-textHeight      res) height)
+    ;; ugh. there is still some slight nontransparency. fuck.
+    ;; (set! (.-backgroundColor res) false)
     (swap! shits assoc label res)
     res))
 
@@ -222,7 +243,7 @@
 
       ;; todo hmm. not sure, it shows huge blobs?
       ;; right.. it's controlled by :val.. but colors  need to be more transparent for the objects themselves?
-      :nodeThreeObjectExtend true
+      ;; :nodeThreeObjectExtend true
       ;; TODO this js* is nice..
       ;; x (js* "new SpriteText('HELOOOOOOOOOOOO')")]
       :nodeThreeObject style-3d-node

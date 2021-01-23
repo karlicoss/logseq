@@ -39,7 +39,7 @@
               {:id p
                :name p
                ;; ugh. so apparently this only impacts node sizes... whereas I want sources
-               :val  conns
+               :val  (js/Math.log conns)
                :autoColorBy "group"
                ;; TODO what's group for?? I don't think colors do anything either
                :group (js/Math.ceil (* (js/Math.random) 12))
