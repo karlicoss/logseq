@@ -6,6 +6,7 @@
             [clojure.pprint :refer [pprint]]
             [frontend.state :as state]
             [frontend.db :as db]
+            ["three-spritetext" :as SpriteText]
             [cljs-bean.core :as bean]))
 
 ;; translated from https://github.com/vasturiano/react-force-graph/blob/master/example/highlight/index.html
@@ -191,7 +192,17 @@
       ;; :nodeVal (fn [n] (if (= (gobj/get n "id") "hpi") (do (js/console.error "YEEES" n) 1000) 1))
       ;; :nodeVal "val"
       :nodeLabel "id"
-      :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.1)"))
+
+      ;; :nodeThreeObjectExtend true
+      ;; TODO this js* is nice..
+      ;; x (js* "new SpriteText('HELOOOOOOOOOOOO')")]
+      :nodeThreeObject (fn [n]
+                         (let [id (gobj/get n "id")
+                               res (new SpriteText id)]
+                           (set! (.-color res) "red")
+                           res))
+
+      :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.3)"))
       ;; crashes for some reason...
       ;; :onZoom (fn [z]
       ;;           (let [k (:k (bean/->clj z))]
