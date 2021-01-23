@@ -20,11 +20,17 @@
            (if @graph-component
              (reset! *loading? false)
              (do
+               ;; ok, at least I didn't have to manually remove the component thing?
+               ;; yarn add react-force-graph-3d
+               ;; cp node_modules/react-force-graph-3d/dist/react-force-graph-3d.js static/js/react-force-graph-3d.js
+               ;; (for some reason doesn't load directly from node_modules??)
                (loader/load
-                (config/asset-uri "/static/js/react-force-graph.min.js")
+                (config/asset-uri "/static/js/react-force-graph-3d.js")
                 (fn []
                   (reset! graph-component
-                          (r/adapt-class (gobj/get js/window.ForceGraph "ForceGraph2D")))
+                          ;; TODO HERE -- change to 3D?
+                          ;; NOTE: need to hard refresh page (Ctrl-F5)
+                          (r/adapt-class js/window.ForceGraph3D))
                   (reset! *loading? false)))))
            state)}
   [opts]
