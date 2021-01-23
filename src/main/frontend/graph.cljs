@@ -140,19 +140,22 @@
      {:graphData (bean/->js graph-data)
       ;; :nodeRelSize node-r
       :linkWidth 1
+      :backgroundColor "white"
       ;; :linkWidth 5
       ;; :linkWidth (fn [link]
       ;;              (let [link {:source (gobj/get link "source")
       ;;                          :target (gobj/get link "target")}]
       ;;                    ;; _ (pprint link)]
       ;;                (if (contains? @highlight-links link) 5 1)))
+      ;; crashes for some reason..
       :linkDirectionalParticles 2
-      :linkDirectionalParticleWidth (fn [link]
-                                      (let [link {:source (-> (gobj/get link "source")
-                                                              (gobj/get "id"))
-                                                  :target (-> (gobj/get link "target")
-                                                              (gobj/get "id"))}]
-                                        (if (contains? @highlight-links link) 4 0)))
+      :linkDirectionalParticleWidth 3
+      ;; :linkDirectionalParticleWidth (fn [link]
+      ;;                                 (let [link {:source (-> (gobj/get link "source")
+      ;;                                                         (gobj/get "id"))
+      ;;                                             :target (-> (gobj/get link "target")
+      ;;                                                         (gobj/get "id"))}]
+      ;;                                   (if (contains? @highlight-links link) 4 0)))
       ;; todo wider?
 
       ;; ugh. ngraph doesn't work??
@@ -189,15 +192,16 @@
       ;; :nodeVal "val"
       :nodeLabel "id"
       :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.1)"))
-      :onZoom (fn [z]
-                (let [k (:k (bean/->clj z))]
-                  (reset! graph-mode
-                          (cond
-                            (or dot-mode? (< k 0.4))
-                            :dot
+      ;; crashes for some reason...
+      ;; :onZoom (fn [z]
+      ;;           (let [k (:k (bean/->clj z))]
+      ;;             (reset! graph-mode
+      ;;                     (cond
+      ;;                       (or dot-mode? (< k 0.4))
+      ;;                       :dot
 
-                            :else
-                            :dot-text))))
+      ;;                       :else
+      ;;                       :dot-text))))
       :onNodeClick (fn [node event]
                      (let [page-name (string/lower-case (gobj/get node "id"))]
                        (if (gobj/get event "shiftKey")
