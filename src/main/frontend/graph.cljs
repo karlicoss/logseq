@@ -30,23 +30,28 @@
   [link]
   (swap! highlight-links conj (bean/->clj link)))
 
+(defn- colour-group
+  [node col]
+  (let [labels (cons (gobj/get node "id") (gobj/get node "neighbors"))]
+    (doseq [label labels]
+      (let [obj (get @shits label)]
+        (set! (.-color obj) col)))))
+
 (defn- on-node-hover
   [node]
   (clear-highlights!)
-  (if node
-    (let [label (gobj/get node "id")]
-      (highlight-node! label)
-      (doseq [neighbor (array-seq (gobj/get node "neighbors"))]
-        (highlight-node! neighbor))
-      (doseq [link (array-seq (gobj/get node "links"))])
-      (when shits
-        (let [res (get @shits label)]
-          (set! (.-color res) "red")))
-     (reset! hover-node label))
-    (reset! hover-node nil)))
-    ;; (doseq [shit @shits]
-    ;;   (pprint shit)))
-    ;; (set! (.-color shit) "red"))
+  ;; ugh fuck. seems that sometimes on multiple 'nl on' events there is only a single 'hl off?
+  ;; (try moving mouse quickly)
+
+  ;;; always remove old hl regardless
+  (when @hover-node
+    (colour-group @hover-node (gobj/get @hover-node "color")))
+  ;; color new if necessary
+  (when node
+    (colour-group node "#a00"))
+
+  (reset! hover-node node))
+
 
 (defn- on-link-hover
   [link]
@@ -128,15 +133,10 @@
   (let [label (gobj/get node "id")
         val (gobj/get node "val")
         val (if (zero? val) 1 val)
-        highlighted (contains? @highlight-nodes label)
-        ;; _ (pprint ["HIGHLIGHTED", highlighted])
-        ;;
-        textcolor (if highlighted "#a00" (gobj/get node "color"))
-        ;;
+        textcolor (gobj/get node "color")
         res (new SpriteText label)]
     (set! (.-color res) textcolor)
     (swap! shits assoc label res)
-    ;; (swap! shits conj res)
     res))
 
 
