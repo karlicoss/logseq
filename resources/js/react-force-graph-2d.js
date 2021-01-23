@@ -7937,7 +7937,15 @@
     if (links == null) links = [];
 
     function defaultStrength(link) {
-      return 1 / Math.min(count[link.source.index], count[link.target.index]);
+      /* XXX attractive force
+         - defaultStrenght: low value makes it appear like a blob
+	 - defaultStrength: smth like 10 completely breaks the simulation?
+	 - changing min to max results in 'leafy' nodes pushed very far apart
+	 - adding Math.pow(count, 2) -- weird. I guess pow has similar effect and reduces the force effectively
+         - changing distance to large values -- again, weird cicrular artifacts??
+           I guess it's sort of an 'expected distance'? and at some point it's dominated by the repulsion anyway. default 30 is good enough
+      */
+      return 1 / Math.pow(Math.min(count[link.source.index], count[link.target.index]), 1);
     }
 
     function force(alpha) {
@@ -8417,12 +8425,19 @@
     };
   }
 
+  /* XXX repulsive force
+     - distanceMin is interesting (e.g. set to 1000000). pushes unrelated stuff far, but it ends up clumping
+     - distanecMax -- if I lower it, it ends up clumping + some circular artifacts (although they might be intesting too!)
+     - strenght: setting to something like -400 effectively has the same effect as default zoom? they are just a bit more spread apart
+       ok, -200 is good enough
+       TODO guess could add a force multiplier here for specific nodes? like social for example?
+  */ 
   function forceManyBody() {
     var nodes,
         nDim,
         node,
         alpha,
-        strength = constant$4(-30),
+        strength = constant$4(-200),
         strengths,
         distanceMin2 = 1,
         distanceMax2 = Infinity,

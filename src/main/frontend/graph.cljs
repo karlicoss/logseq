@@ -61,9 +61,7 @@
         val (gobj/get node "val")
         val (if (zero? val) 1 val)
         highlighted (contains? @highlight-nodes label)
-        font-size (min
-                   10
-                   (* (/ 15 global-scale) (js/Math.cbrt val)))
+        font-size (min 25 (max 15 val))
         arc-radius (/ 3 global-scale)
         _ (set! (.-font ctx)
                 (str font-size "px Inter"))
@@ -135,7 +133,7 @@
                 (let [k (:k (bean/->clj z))]
                   (reset! graph-mode
                           (cond
-                            (< k 0.4)
+                            (< k 0.2)
                             :dot
 
                             :else
