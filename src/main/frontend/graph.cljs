@@ -15,6 +15,7 @@
 (defonce highlight-links (atom #{}))
 (defonce hover-node (atom nil))
 (defonce node-r 8)
+(defonce shits (atom {}))
 
 (defn- clear-highlights!
   []
@@ -32,13 +33,20 @@
 (defn- on-node-hover
   [node]
   (clear-highlights!)
-  (when node
-    (highlight-node! (gobj/get node "id"))
-    (doseq [neighbor (array-seq (gobj/get node "neighbors"))]
-      (highlight-node! neighbor))
-    (doseq [link (array-seq (gobj/get node "links"))]
-      (highlight-link! link)))
-  (reset! hover-node (gobj/get node "id")))
+  (if node
+    (let [label (gobj/get node "id")]
+      (highlight-node! label)
+      (doseq [neighbor (array-seq (gobj/get node "neighbors"))]
+        (highlight-node! neighbor))
+      (doseq [link (array-seq (gobj/get node "links"))])
+      (when shits
+        (let [res (get @shits label)]
+          (set! (.-color res) "red")))
+     (reset! hover-node label))
+    (reset! hover-node nil)))
+    ;; (doseq [shit @shits]
+    ;;   (pprint shit)))
+    ;; (set! (.-color shit) "red"))
 
 (defn- on-link-hover
   [link]
@@ -79,6 +87,7 @@
         val (gobj/get node "val")
         val (if (zero? val) 1 val)
         highlighted (contains? @highlight-nodes label)
+        ;;
         font-size (min
                    10
                    (* (/ 15 global-scale) (js/Math.cbrt val)))
@@ -112,6 +121,24 @@
             (if dark? "#A3BFFA" "#4C51BF")
             (if dark? "#999" "#666")))
     (.fill ctx)))
+
+
+(defn- style-3d-node
+  [node]
+  (let [label (gobj/get node "id")
+        val (gobj/get node "val")
+        val (if (zero? val) 1 val)
+        highlighted (contains? @highlight-nodes label)
+        ;; _ (pprint ["HIGHLIGHTED", highlighted])
+        ;;
+        textcolor (if highlighted "#a00" (gobj/get node "color"))
+        ;;
+        res (new SpriteText label)]
+    (set! (.-color res) textcolor)
+    (swap! shits assoc label res)
+    ;; (swap! shits conj res)
+    res))
+
 
 (defn build-graph-data
   [{:keys [links nodes]}]
@@ -149,8 +176,8 @@
       ;;                    ;; _ (pprint link)]
       ;;                (if (contains? @highlight-links link) 5 1)))
       ;; crashes for some reason..
-      :linkDirectionalParticles 2
-      :linkDirectionalParticleWidth 3
+      :linkDirectionalParticles 0
+      :linkDirectionalParticleWidth 1
       ;; :linkDirectionalParticleWidth (fn [link]
       ;;                                 (let [link {:source (-> (gobj/get link "source")
       ;;                                                         (gobj/get "id"))
@@ -193,14 +220,12 @@
       ;; :nodeVal "val"
       :nodeLabel "id"
 
-      ;; :nodeThreeObjectExtend true
+      ;; todo hmm. not sure, it shows huge blobs?
+      ;; right.. it's controlled by :val.. but colors  need to be more transparent for the objects themselves?
+      :nodeThreeObjectExtend true
       ;; TODO this js* is nice..
       ;; x (js* "new SpriteText('HELOOOOOOOOOOOO')")]
-      :nodeThreeObject (fn [n]
-                         (let [id (gobj/get n "id")
-                               res (new SpriteText id)]
-                           (set! (.-color res) "red")
-                           res))
+      :nodeThreeObject style-3d-node
 
       :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.3)"))
       ;; crashes for some reason...
