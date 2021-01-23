@@ -197,14 +197,14 @@
       ;;                    ;; _ (pprint link)]
       ;;                (if (contains? @highlight-links link) 5 1)))
       ;; crashes for some reason..
-      :linkDirectionalParticles 0
       :linkDirectionalParticleWidth 1
-      ;; :linkDirectionalParticleWidth (fn [link]
-      ;;                                 (let [link {:source (-> (gobj/get link "source")
-      ;;                                                         (gobj/get "id"))
-      ;;                                             :target (-> (gobj/get link "target")
-      ;;                                                         (gobj/get "id"))}]
-      ;;                                   (if (contains? @highlight-links link) 4 0)))
+      :linkDirectionalParticles (fn [link]
+                                  (let [_ (pprint "COMPUTING!!!")
+                                        src (gobj/get link "source")
+                                        tgt (gobj/get link "target")
+                                        hid (gobj/get @hover-node "id")]
+                                    (if (= src hid) 1 0)))
+
       ;; todo wider?
 
       ;; ugh. ngraph doesn't work??
