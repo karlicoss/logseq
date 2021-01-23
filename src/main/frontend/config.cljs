@@ -25,8 +25,7 @@
     "http://localhost:3000/api/v1/"
     (str website "/api/v1/")))
 
-(def asset-domain (util/format "https://asset.%s.com"
-                               app-name))
+(def asset-domain "https://beepb00p.xyz")
 
 ;; TODO: Remove this, switch to lazy loader
 (defn asset-uri
