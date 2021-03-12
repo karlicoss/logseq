@@ -77,6 +77,11 @@
                  (- x (/ text-width 2))
                  (- y (/ 9 global-scale))))
 
+    ;; ok, this sort of displays 'bounding boxes' for hover tooltips?
+    ;; (set! (.-fillStyle ctx) "#66666611")
+    ;; (.arc ctx x y val 0 (* 2 js/Math.PI) false)
+    ;; (.fill ctx)
+
     (.beginPath ctx)
     (.arc ctx x y (if (zero? val)
                     arc-radius
@@ -114,17 +119,19 @@
     (merge
      {:graphData (bean/->js graph-data)
       ;; :nodeRelSize node-r
-      :linkWidth (fn [link]
-                   (let [link {:source (gobj/get link "source")
-                               :target (gobj/get link "target")}]
-                     (if (contains? @highlight-links link) 5 1)))
+      :linkWidth 1
+      ;; :linkWidth (fn [link]
+      ;;              (let [link {:source (gobj/get link "source")
+      ;;                          :target (gobj/get link "target")
+      ;;                (if (contains? @highlight-links link) 5 1))
       :linkDirectionalParticles 2
       :linkDirectionalParticleWidth (fn [link]
                                       (let [link {:source (-> (gobj/get link "source")
                                                               (gobj/get "id"))
                                                   :target (-> (gobj/get link "target")
                                                               (gobj/get "id"))}]
-                                        (if (contains? @highlight-links link) 2 0)))
+                                        (if (contains? @highlight-links link) 4 0)))
+      ;; todo wider?
 
       ;; ugh. ngraph doesn't work??
       ;; :forceEngine "ngraph"
@@ -145,7 +152,13 @@
       ;;
 
       :onNodeHover on-node-hover
-      :onLinkHover on-link-hover
+      ;; TODO for fucks sake, it doesn't work properly?
+      :linkHoverPrecision 0
+      ;; NOTE: ok, seems that nodeVal/val control the 'hover area' of the link
+      ;; eh. in dense graphs it ends up obstructing other nodes, etc. think about it later..
+      ;; :onLinkHover on-link-hover
+      ;; :nodeVal (fn [n] (if (= (gobj/get n "id") "hpi") (do (js/console.error "YEEES" n) 1000) 1))
+      ;; :nodeVal "val"
       :nodeLabel "id"
       :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.1)"))
       :onZoom (fn [z]
