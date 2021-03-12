@@ -887,7 +887,49 @@
 (defn get-pages-relation
   [repo with-journal?]
   (when-let [conn (conn/get-conn repo)]
-    (let [q (if with-journal?
+    (let [g '[:find ?block ?child
+              :where
+              [?bid :block/title    ?block]
+              [?bid :block/children ?cid]
+              [?cid :block/title    ?child]]
+
+          ;; TODO not sure about these... maybe it's enough to link filetags, dunno
+          ;; anyway, not that much difference really
+          fp '[:find ?page ?tag
+               :where
+               [?pid   :page/name  ?page]
+               [?block :block/page ?pid]
+               [?block :block/ref-pages ?rpid]
+               [?rpid  :page/name  ?tag]]
+          f0 '[:find ?qq ?tidd :where [?bid0 :block/ref-pages ?bidd] [?bidd :page/name ?qq] [?tid :page/name ?tidd]
+               [?bid0 :block/ref-pages ?tid]]
+          f1 '[:find ?qq ?tidd :where [?bid0 :block/ref-pages ?bidd] [?bidd :page/name ?qq] [?tid :page/name ?tidd]
+               [?bid1 :block/children  ?bid0]
+               [?bid1 :block/ref-pages ?tid]]
+          ;; TODO maybe if parent doesn't reference any pages, just use the heading?
+          ;; dunno.
+          f2 '[:find ?qq ?tidd :where [?bid0 :block/ref-pages ?bidd] [?bidd :page/name ?qq] [?tid :page/name ?tidd]
+               [?bid2 :block/children  ?bid1]
+               [?bid1 :block/children  ?bid0]
+               [?bid2 :block/ref-pages ?tid]]
+          f3 '[:find ?qq ?tidd :where [?bid0 :block/ref-pages ?bidd] [?bidd :page/name ?qq] [?tid :page/name ?tidd]
+               [?bid3 :block/children  ?bid2]
+               [?bid2 :block/children  ?bid1]
+               [?bid1 :block/children  ?bid0]
+               [?bid3 :block/ref-pages ?tid]]
+
+          ign '[:find ?page
+                :where
+                [?pid :page/name ?page]
+                [?pid :page/properties ?pp]
+                [(get ?pp :logseq_graph "true") ?tt]
+                [(== ?tt "false")]]
+          ignored (set (map first (d/q ign conn)))
+          ignored (set/union ignored (state/get-suppressed-tags))
+          ;; TODO maybe ideally it would be handled in graph.cljs::build-grlobal-graph
+          ;; but too much trouble for now
+
+          q (if with-journal?
               '[:find ?page ?ref-page-name
                 :where
                 [?p :page/name ?page]
@@ -898,19 +940,38 @@
                 :where
                 [?p :page/journal? false]
                 [?p :page/name ?page]
+                [?p :page/properties ?pp]
+                [(get ?pp :logseq_graph "true") ?tt]
+                [(!= ?tt "false")]
+
                 [?block :block/page ?p]
                 [?block :block/ref-pages ?ref-page]
                 [?ref-page :page/name ?ref-page-name]])
           w '[:find ?page1 ?page2
-               :where
-               [?rp1   :page/name ?page1]
-               [?block :block/ref-pages ?rp1]
-               [?block :block/ref-pages ?rp2]
-               [?rp2   :page/name ?page2]]]
+              :where
+              [?rp1   :page/name ?page1]
+              [?block :block/ref-pages ?rp1]
+              [?block :block/ref-pages ?rp2]
+              [?rp2   :page/name ?page2]
+              [(!= ?page1 ?page2)]]
+          res (set/union
+               (d/q fp conn)
+               (d/q f0 conn)
+               (d/q f1 conn))
+          ;; (d/q f2 conn)
+          ;; (d/q f3 conn)
+          ;; TODO f2/f3 seems way too spammy..
+
+          ignored (set (map string/lower-case ignored)) ;; ugh, all pages are lowercase?
+          ;; remove pages suppressed from the graph
+          res (remove (fn [[a b]] (or (contains? ignored a) (contains? ignored b))) res)
+          ;; remove symmetric links (make antisymmetric), just for better performance
+          res (map sort res)
+          ;; remove self link (make antireflexive) (TODO make confirugable ('show orphans'))
+          res (remove (fn [[a b]] (= a b)) res)]
       (->>
-       (set/union
-        (d/q q conn)
-        (d/q w conn))
+       res
+       set
        (map (fn [[page ref-page-name]]
               [page ref-page-name]))))))
 

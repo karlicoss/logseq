@@ -108,13 +108,7 @@
             other-pages (if (seq other-pages)
                           (map string/lower-case other-pages)
                           other-pages)
-            nodes (concat (seq relation)
-                          (seq tagged-pages)
-                          (if (seq other-pages)
-                            (map (fn [page]
-                                   [page])
-                                 other-pages)
-                            []))
+            nodes (concat (seq relation))
             edges (build-edges (remove
                                 (fn [[_ to]]
                                   (nil? to))
