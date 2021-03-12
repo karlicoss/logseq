@@ -4,7 +4,7 @@
   --ls-page-text-size: 1em;
   --ls-page-title-size: 36px;
   --ls-font-family: 'Inter';
-  --ls-main-content-max-width: 700px;
+  --ls-main-content-max-width: 60rem; /* make consistent with blog */
   --ls-border-radius-low: 4px;
   --ls-border-radius-medium: 8px;
 }

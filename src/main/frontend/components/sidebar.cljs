@@ -132,7 +132,7 @@
            (ui/loading (t :loading))]]
 
          :else
-         [:div.pb-24 {:class (if global-graph-pages? "" (util/hiccup->class "max-w-7xl.mx-auto"))
+         [:div.pb-24 {:class (if global-graph-pages? "" "")
                       :style {:margin-bottom (if global-graph-pages? 0 120)}}
           main-content])]]]))
 
