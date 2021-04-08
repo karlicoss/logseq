@@ -1197,6 +1197,8 @@
              (when-let [page (db/entity (:db/id tag))]
                (let [tag (:page/name page)]
                  [:a.tag.mx-1 {:data-ref tag
+                               ;; TODO here??
+                               ;; :9007/static/js/cljs-runtime/module$node_modules$react_dom$cjs$react_dom_development.js:2 Warning: Encountered two children with the same key, `tag-`. Keys should be unique so that components maintain their identity across updates.
                                :key (str "tag-" (:db/id tag))
                                :href (rfe/href :page {:name tag})}
                   (str "#" tag)])))
