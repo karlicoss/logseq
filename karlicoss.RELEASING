@@ -1,0 +1,9 @@
+NOTE: for some reason some python3 -m http.server isn't working properly... but works in prod?
+- export public pages
+  NOTE: seems that it might be useful sometimes to remove the graph and reimport again before exporning.. ugh
+- copy index.html from download here (UPD no need to it reads Downloads)
+- run split.py (it will move index.py and separate graph into current dir)
+- run yarn release-publishing
+- run sync script??
+  cd into the result dir, review changes & commit everything
+- push both to github and beepb00p
