@@ -18,6 +18,10 @@ def run() -> None:
     ldb['src'] = '/logseq_graph.js'
     i.write_text(str(soup))
     shutil.move(str(i), '.')
+    # FIXME might need to patch up and replace js/main.js with js/publishing/main.js ??
+    # see
+    # https://github.com/logseq/logseq/commit/5ce319415ca0f75ac35952fb9b8872ddf32ff2a5#diff-7be9b89e5079c4efd869a933d7b546415e2e749251167a9cac8c09b748bb88b1R87
+
 
 
 def main() -> None:
