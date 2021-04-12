@@ -158,5 +158,12 @@
       ;;                   (.zoomToFit @ref 400)))
       :nodeCanvasObject
       (fn [node ^CanvasRenderingContext2D ctx global-scale]
-        (dot-text-mode node ctx global-scale dark?))}
+        (dot-text-mode node ctx global-scale dark?))
+
+      :onNodeDragEnd    (fn [node]
+                          (do (aset node "fx" (gobj/get node "x"))
+                              (aset node "fy" (gobj/get node "y"))))
+      :onNodeRightClick (fn [node]
+                          (do (aset node "fx" nil)
+                              (aset node "fy" nil)))}
      option)))
