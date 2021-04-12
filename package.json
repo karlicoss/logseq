@@ -78,6 +78,7 @@
         "path": "^0.12.7",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
+        "react-force-graph-3d": "^1.18.8",
         "react-resize-context": "^3.0.0",
         "react-textarea-autosize": "^8.0.1",
         "react-transition-group": "^4.3.0",
