@@ -14,10 +14,9 @@
        [:h1.title "Export"]
 
        [:ul.mr-1
-        (when (util/electron?)
           [:li.mb-4
            [:a.font-medium {:on-click #(export/export-repo-as-html! current-repo)}
-            (t :export-public-pages)]])
+            (t :export-public-pages)]]
         [:li.mb-4
          [:a.font-medium {:on-click #(export/export-repo-as-markdown! current-repo)}
           (t :export-markdown)]]
