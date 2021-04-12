@@ -5,6 +5,7 @@
             [goog.object :as gobj]
             [frontend.state :as state]
             [frontend.db :as db]
+            ["three-spritetext" :as SpriteText]
             [cljs-bean.core :as bean]))
 
 ;; translated from https://github.com/vasturiano/react-force-graph/blob/master/example/highlight/index.html
@@ -88,6 +89,24 @@
             (if dark? "#999" "#666")))
     (.fill ctx)))
 
+
+(defn- style-3d-node
+  [node]
+  (let [label (gobj/get node "id")
+        val (gobj/get node "val")
+        val (max val 2.0)
+        textcolor (gobj/get node "color")
+        height (js/Math.min
+                30
+                (js/Math.max
+                 5
+                 (js/Math.exp val)))
+        ;; shit, it overlaps the node and ends up pretty ugly... why does it have to be so hard
+        res (new SpriteText label)]
+    (set! (.-color           res) textcolor)
+    (set! (.-textHeight      res) height)
+    res))
+
 (defn build-graph-data
   [{:keys [links nodes]}]
   (let [nodes (mapv
@@ -115,47 +134,17 @@
     (merge
      {:graphData (bean/->js graph-data)
       ;; :nodeRelSize node-r
-      :linkWidth (fn [link]
-                   (let [link {:source (gobj/get link "source")
-                               :target (gobj/get link "target")}]
-                     (if (contains? @highlight-links link) 5 1)))
+      :linkWidth 1
+      :backgroundColor "white"
       :linkDirectionalParticles 2
-      :linkDirectionalParticleWidth (fn [link]
-                                      (let [link {:source (-> (gobj/get link "source")
-                                                              (gobj/get "id"))
-                                                  :target (-> (gobj/get link "target")
-                                                              (gobj/get "id"))}]
-                                        (if (contains? @highlight-links link) 2 0)))
+      :linkDirectionalParticleWidth  1
       :onNodeHover on-node-hover
-      :onLinkHover on-link-hover
       :nodeLabel "id"
       :linkColor (fn [] (if dark? "rgba(255,255,255,0.2)" "rgba(0,0,0,0.1)"))
-      :onZoom (fn [z]
-                (let [k (:k (bean/->clj z))]
-                  (reset! graph-mode
-                          (cond
-                            (< k 0.4)
-                            :dot
-
-                            :else
-                            :dot-text))))
-      :onNodeClick (fn [node event]
-                     (let [page-name (string/lower-case (gobj/get node "id"))]
-                       (if (gobj/get event "shiftKey")
-                         (let [repo (state/get-current-repo)
-                               page (db/entity repo [:page/name page-name])]
-                           (state/sidebar-add-block!
-                            repo
-                            (:db/id page)
-                            :page
-                            {:page page}))
-                         (route-handler/redirect! {:to :page
-                                                   :path-params {:name page-name}}))))
       ;; :cooldownTicks 100
       ;; :onEngineStop (fn []
       ;;                 (when-let [ref (:ref-atom option)]
       ;;                   (.zoomToFit @ref 400)))
-      :nodeCanvasObject
-      (fn [node ^CanvasRenderingContext2D ctx global-scale]
-        (dot-text-mode node ctx global-scale dark?))}
+      ; vvvv this is the most important thing here!
+      :nodeThreeObject style-3d-node}
      option)))
