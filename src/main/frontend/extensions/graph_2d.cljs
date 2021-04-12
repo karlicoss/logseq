@@ -21,10 +21,10 @@
              (reset! *loading? false)
              (do
                (loader/load
-                (config/asset-uri "/static/js/react-force-graph.min.js")
+                (config/asset-uri "/static/js/react-force-graph-3d.js")
                 (fn []
                   (reset! graph-component
-                          (r/adapt-class (gobj/get js/window.ForceGraph "ForceGraph2D")))
+                          (r/adapt-class js/window.ForceGraph3D))
                   (reset! *loading? false)))))
            state)}
   [opts]
