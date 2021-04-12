@@ -473,7 +473,12 @@
           {:on-click (fn [_e]
                        (swap! show-journal? not))}
           (str (t :page/show-journals)
-               (if @show-journal? " (ON)"))]]]])))
+               (if @show-journal? " (ON)"))]]
+        [:div "dragging nodes pins them in fixed position"]
+        [:div "right click on node will unpin it"]
+        [:div "left click on node will search for all related blocks"]
+        [:div "warning: this will unpin all nodes!"]]])))
+
 
 (rum/defc all-pages < rum/reactive
   ;; {:did-mount (fn [state]
